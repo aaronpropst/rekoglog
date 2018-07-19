@@ -1,0 +1,31 @@
+aws rekognition create-collection --collection-id face_collection --region us-west-2
+
+
+Xiaobing-MacBook-Pro:.aws brianprince$ aws rekognition create-collection --collection-id face_collection --region us-west-2
+{
+    "CollectionArn": "aws:rekognition:us-west-2:504626598389:collection/face_collection", 
+    "StatusCode": 200
+}
+
+
+
+AmazonRekognitionFullAccess
+AmazonDynamoDBFullAccess
+AmazonS3FullAccess
+IAMFullAccess
+
+
+aws dynamodb create-table --table-name face_collection \
+--attribute-definitions AttributeName=RekognitionId,AttributeType=S \
+--key-schema AttributeName=RekognitionId,KeyType=HASH \
+--provisioned-throughput ReadCapacityUnits=1,WriteCapacityUnits=1 \
+--region us-west-2
+
+
+aws s3 mb s3://hogshead-face-collection --region us-west-2
+
+aws iam create-role --role-name LambdaRekognitionRole --assume-role-policy-document file://trust-policy.json
+
+aws iam put-role-policy --role-name LambdaRekognitionRole --policy-name LambdaPermissions --policy-document file://access-policy.json
+
+aws rekognition list-faces --collection-id "face_collection"  
