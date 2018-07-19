@@ -16,7 +16,7 @@ The back end code is built upon [Node Red](https://nodered.org)
 ### HTML5 UI
 ![Authenticated Form](images/authenticated.png)
 
-The [front end form](static/index.html) is served out of a static files directory by node red.  It waits for a user to enter a username, then begins capturing images of them via webRTC getMedia webcam.  It posts these every 4 seconds to the nod-red backend, who verifies them with AWS.
+The [front end form](static/index.html) is served out of a static files directory by node red.  It waits for a user to enter a username, then begins capturing images of them via webRTC getMedia stream.  It posts image blobs every 4 seconds to the node-red backend that verifies them with AWS.
 
 ### Node-Red
 ![Node-Red Flow](images/node-red-flow.png)
@@ -38,7 +38,7 @@ The scripts @Xiaobingliu2014 used to add images to the indexes can be found [her
 
 In the interests of research I have piped data back to the client that it shouldn't have and if such a process were to be implemented more verification would need to take place on the back end with less trust of the client side code.
 
-Webcam face authentication can easily be spoofed with printouts of publicly available face data.  As a person can't secure their face nor change it when compromised, it's a relatively small added layer of security.  The tech is neat though!  : )
+Webcam face authentication can easily be spoofed with printouts of publicly available images.  As a person can't secure their face nor change it when compromised, it's a relatively small added layer of security.  The tech is neat though!  : )
 
 I tested this only in Chrome.
 
