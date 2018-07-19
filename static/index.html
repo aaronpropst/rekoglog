@@ -1,0 +1,120 @@
+<!doctype html>
+<html>
+<head>
+	<title>WebRTC: Still photo capture demo</title>
+	<meta charset='utf-8'>
+	<!-- <link rel="stylesheet" href="main.css" type="text/css" media="all"> -->
+	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.2/css/bootstrap.min.css" type="text/css" media="all">
+	<!-- <link rel="stylesheet" href="bootstrap.min.css" type="text/css" media="all"> -->
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+
+	<script src="capture.js"></script>
+	<style type="text/css">
+		#video {
+			border: 1px solid black;
+			box-shadow: 2px 2px 3px black;
+			width:340px;
+			height:240px;
+		}
+
+		#photo {
+			border: 1px solid black;
+			box-shadow: 2px 2px 3px black;
+			width:340px;
+			height:240px;
+		}
+
+		#canvas {
+			display:none;
+		}
+
+		.camera {
+			width: 340px;
+			display:inline-block;
+		}
+
+		.output {
+			width: 340px;
+			display:inline-block;
+		}
+
+		#startbutton {
+			display:block;
+			position:relative;
+			margin-left:auto;
+			margin-right:auto;
+			bottom:32px;
+			background-color: rgba(0, 150, 0, 0.5);
+			border: 1px solid rgba(255, 255, 255, 0.7);
+			box-shadow: 0px 0px 1px 2px rgba(0, 0, 0, 0.2);
+			font-size: 14px;
+			font-family: "Lucida Grande", "Arial", sans-serif;
+			color: rgba(255, 255, 255, 1.0);
+		}
+
+		.contentarea {
+			font-size: 16px;
+			font-family: "Lucida Grande", "Arial", sans-serif;
+			/* width: 760px; */
+		}
+		.lform label{
+			width: 5em;
+			text-align: right;
+			display: inline-block;
+		}
+		#canvas{
+			display: none;
+		}
+		#contentarea.container{
+			width: 800px;
+			margin-left: auto;
+			margin-right: auto;
+			margin-top: 4em;
+
+			border: 1px solid #cccccc;
+			border-radius: 5px;
+			padding: 2em;
+		}
+		.lform{
+			padding-top: 3em;
+		}
+		#video,
+		#photo{
+			display: none;
+			border: 10px solid red;
+			border-radius: 20px;
+		}
+		#video.authorized,
+		#photo.authorized{
+			border: 10px solid green;
+		}
+	</style>
+</head>
+<body>
+<div id="contentarea" class="contentarea container">
+	<div class="row">
+		<div class="lform col-sm">
+		<form action="logIn">
+			<label for="username">Username:</label> <input id="username" name="username" type="text" /><br/>
+			<label for="password">Password:</label> <input name="password" type="password" /><br/>
+			<input id="loginButton" type="submit" value="Log In" disabled="true" />
+		</form>
+		</div>
+
+		<div class="camera col-sm">
+			<video id="video">Video stream not available.</video>
+			<!--<button id="startbutton">Take photo</button> -->
+		</div>
+
+	</div>
+
+</div>
+
+
+<canvas id="canvas"></canvas>
+<div class="output" >
+	<img id="photo" alt="The screen capture will appear in this box." /> 
+</div>
+
+</body>
+</html>
