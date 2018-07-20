@@ -1,0 +1,13 @@
+version: '2'
+ 
+services:
+
+  hack:
+    image: node
+    volumes:
+      - ./:/data
+      - ./local-settings.js:/data/settings.js
+      - ~/.aws:/root/.aws:ro
+    ports:
+      - 1880:1880
+    entrypoint: bash -c 'cd /data/ && npm install && cd /data/node_modules/node-red && npm start -- --userDir /data'

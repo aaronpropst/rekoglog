@@ -42,3 +42,27 @@ Webcam face authentication can easily be spoofed with printouts of publicly avai
 
 I tested this only in Chrome.
 
+## Running the Code
+
+You can set up and run this project locally using docker-compose.
+
+```sh
+~/code/rekoglog$ docker-compose up -d
+Recreating rekoglog_hack_1 ... done
+```
+
+The docker-compose file is set up to mount your aws credentials file into the container.  You can specify aws credentials in one of the aws specific nodes to bypass that.  The flow won't function until you provide access.
+
+### Aws Resource mappings
+
+These are the AWS resources you'd need to run the node-red flow:
+
+|System|Type|Name|
+|---|---|---|
+|Rekognition    |collection     |face_collection    |
+|Dynamo         |table          |face_collection    |
+
+These were derived largely from runnning through this guide:
+https://aws.amazon.com/blogs/machine-learning/build-your-own-face-recognition-service-using-amazon-rekognition/
+
+So doing that in your aws account should get you set up.
