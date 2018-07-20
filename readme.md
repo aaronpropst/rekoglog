@@ -30,13 +30,14 @@ Once 'authenticated' is true, the form is unlocked and the user may proceed with
 
 ### Source Imagery Indexing
 ![Aws Indexing Workflow](https://d2908q01vomqb2.cloudfront.net/f1f836cb4ea6efb2a0b1b99f41ad8b103eff4b59/2017/08/15/face_recognition_1_1_1.gif)
+
 Source images were uploaded to s3, processed by a lambda trigger that indexes the faces in rekognition and indexes the face-id/username relationship in Dynamo.  [That indexing process is well described here](https://aws.amazon.com/blogs/machine-learning/build-your-own-face-recognition-service-using-amazon-rekognition/)
 
 The scripts @Xiaobingliu2014 used to add images to the indexes can be found [here](indexing/)
 
 ## Caveats
 
-In the interests of research I have piped data back to the client that it shouldn't have and if such a process were to be implemented more verification would need to take place on the back end with less trust of the client side code.
+In the interests of testing I have piped data back to the client that it shouldn't have and if such a process were to be implemented more verification would need to take place on the back end with less trust of the client side code.
 
 Webcam face authentication can easily be spoofed with printouts of publicly available images.  As a person can't secure their face nor change it when compromised, it's a relatively small added layer of security.  The tech is neat though!  : )
 
