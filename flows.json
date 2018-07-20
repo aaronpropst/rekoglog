@@ -7,6 +7,13 @@
         "info": ""
     },
     {
+        "id": "e14d9b8d.0bf368",
+        "type": "tab",
+        "label": "deprecated",
+        "disabled": true,
+        "info": ""
+    },
+    {
         "id": "9c11537c.9739c",
         "type": "amazon config",
         "z": "",
@@ -28,218 +35,7 @@
         "y": 100,
         "wires": [
             [
-                "fd7b6cdb.e25c6"
-            ]
-        ]
-    },
-    {
-        "id": "4d422730.e26118",
-        "type": "http response",
-        "z": "3382f3e8.29c93c",
-        "name": "",
-        "statusCode": "200",
-        "headers": {
-            "content-type": "application/json"
-        },
-        "x": 1310,
-        "y": 20,
-        "wires": []
-    },
-    {
-        "id": "24d1070e.505758",
-        "type": "AWS Rekognition",
-        "z": "3382f3e8.29c93c",
-        "aws": "9c11537c.9739c",
-        "operation": "CompareFaces",
-        "SourceImage": "",
-        "TargetImage": "",
-        "CollectionId": "",
-        "Input": "",
-        "Output": "",
-        "Name": "",
-        "Settings": "",
-        "RoleArn": "",
-        "FaceIds": "",
-        "Image": "",
-        "Id": "",
-        "JobId": "",
-        "FaceId": "",
-        "Video": "",
-        "name": "",
-        "x": 990,
-        "y": 160,
-        "wires": [
-            [
-                "ca8ef3a1.8c50e",
-                "ce56d52a.9be7b8"
-            ]
-        ]
-    },
-    {
-        "id": "ca8ef3a1.8c50e",
-        "type": "debug",
-        "z": "3382f3e8.29c93c",
-        "name": "",
-        "active": false,
-        "tosidebar": true,
-        "console": false,
-        "tostatus": false,
-        "complete": "false",
-        "x": 1240,
-        "y": 160,
-        "wires": []
-    },
-    {
-        "id": "cc9038d5.44ab68",
-        "type": "function",
-        "z": "3382f3e8.29c93c",
-        "name": "",
-        "func": "//var image = atob(msg.SourceImage);\n\nvar image = Buffer.from(msg.SourceImage, 'base64').toString();\n\nvar length = image.length;\nimageBytes = new ArrayBuffer(length);\nvar ua = new Uint8Array(imageBytes);\nfor (var i = 0; i < length; i++) {\n  ua[i] = image.charCodeAt(i);\n}\n//Call Rekognition  \n//DetectFaces(imageBytes);\n\n\n\nmsg.SourceImage = {\n    Bytes: ua //imageBytes\n};\nmsg.TargetImage = {\n    Bytes: ua //imageBytes\n};\nreturn msg;",
-        "outputs": 1,
-        "noerr": 0,
-        "x": 500,
-        "y": 740,
-        "wires": [
-            [
-                "40fe41cf.d39d2"
-            ]
-        ]
-    },
-    {
-        "id": "dbe68278.53293",
-        "type": "file in",
-        "z": "3382f3e8.29c93c",
-        "name": "",
-        "filename": "",
-        "format": "",
-        "chunk": false,
-        "sendError": false,
-        "x": 700,
-        "y": 80,
-        "wires": [
-            [
-                "9c2a135b.11cb2"
-            ]
-        ]
-    },
-    {
-        "id": "fd7b6cdb.e25c6",
-        "type": "change",
-        "z": "3382f3e8.29c93c",
-        "name": "",
-        "rules": [
-            {
-                "t": "set",
-                "p": "filename",
-                "pt": "msg",
-                "to": "'/data/webrtc-capturestill/reference-image/' & req.params.username & '.png'",
-                "tot": "jsonata"
-            }
-        ],
-        "action": "",
-        "property": "",
-        "from": "",
-        "to": "",
-        "reg": false,
-        "x": 410,
-        "y": 100,
-        "wires": [
-            [
                 "73ea26c.b88c6d8"
-            ]
-        ]
-    },
-    {
-        "id": "40fe41cf.d39d2",
-        "type": "debug",
-        "z": "3382f3e8.29c93c",
-        "name": "",
-        "active": true,
-        "tosidebar": true,
-        "console": false,
-        "tostatus": false,
-        "complete": "true",
-        "x": 680,
-        "y": 740,
-        "wires": []
-    },
-    {
-        "id": "9c2a135b.11cb2",
-        "type": "function",
-        "z": "3382f3e8.29c93c",
-        "name": "",
-        "func": "//var buff = Buffer.from(msg.payload);\n\nvar buff = msg.req.files[0].buffer;\n\n\nmsg.SourceImage = {\n    Bytes: buff\n};\nmsg.TargetImage= {\n    Bytes: msg.payload\n};\n\nreturn msg;",
-        "outputs": 1,
-        "noerr": 0,
-        "x": 860,
-        "y": 80,
-        "wires": [
-            [
-                "24d1070e.505758"
-            ]
-        ]
-    },
-    {
-        "id": "ce56d52a.9be7b8",
-        "type": "json",
-        "z": "3382f3e8.29c93c",
-        "name": "",
-        "property": "payload",
-        "action": "str",
-        "pretty": false,
-        "x": 1120,
-        "y": 80,
-        "wires": [
-            [
-                "4d422730.e26118"
-            ]
-        ]
-    },
-    {
-        "id": "9a9e42f7.d2bc4",
-        "type": "catch",
-        "z": "3382f3e8.29c93c",
-        "name": "",
-        "scope": [
-            "24d1070e.505758"
-        ],
-        "x": 930,
-        "y": 200,
-        "wires": [
-            [
-                "c43f1a5b.13e308"
-            ]
-        ]
-    },
-    {
-        "id": "317bf0d1.ff30f",
-        "type": "http response",
-        "z": "3382f3e8.29c93c",
-        "name": "",
-        "statusCode": "200",
-        "headers": {
-            "content-type": "application/json"
-        },
-        "x": 1270,
-        "y": 200,
-        "wires": []
-    },
-    {
-        "id": "c43f1a5b.13e308",
-        "type": "template",
-        "z": "3382f3e8.29c93c",
-        "name": "",
-        "field": "payload",
-        "fieldType": "msg",
-        "format": "handlebars",
-        "syntax": "mustache",
-        "template": "{\n    \"FaceMatches\": [\n    ],\n    \"SourceImageFace\": {\n    },\n    \"SourceImageOrientationCorrection\": \"ROTATE_0\",\n    \"TargetImageOrientationCorrection\": \"ROTATE_0\",\n    \"UnmatchedFaces\": []\n}",
-        "output": "str",
-        "x": 1060,
-        "y": 200,
-        "wires": [
-            [
-                "317bf0d1.ff30f"
             ]
         ]
     },
@@ -264,12 +60,12 @@
         "FaceId": "",
         "Video": "",
         "name": "",
-        "x": 490,
-        "y": 260,
+        "x": 700,
+        "y": 100,
         "wires": [
             [
-                "2109cbaf.0e2724",
-                "8007c357.7ad99"
+                "5a757ae7.b030d4",
+                "ca20acff.4d2d4"
             ]
         ]
     },
@@ -277,31 +73,17 @@
         "id": "73ea26c.b88c6d8",
         "type": "function",
         "z": "3382f3e8.29c93c",
-        "name": "",
+        "name": "build aws request",
         "func": "//var buff = Buffer.from(msg.payload);\n\nvar buff = msg.req.files[0].buffer;\n\n\nmsg.Image = {\n    Bytes: buff\n};\n\nreturn msg;",
         "outputs": 1,
         "noerr": 0,
-        "x": 280,
-        "y": 260,
+        "x": 430,
+        "y": 100,
         "wires": [
             [
                 "189382fd.8648ad"
             ]
         ]
-    },
-    {
-        "id": "2109cbaf.0e2724",
-        "type": "debug",
-        "z": "3382f3e8.29c93c",
-        "name": "",
-        "active": false,
-        "tosidebar": true,
-        "console": false,
-        "tostatus": false,
-        "complete": "true",
-        "x": 1040,
-        "y": 260,
-        "wires": []
     },
     {
         "id": "2915da68.305896",
@@ -329,11 +111,10 @@
         "ReplicaUpdates": "",
         "TimeToLiveSpecification": "",
         "name": "",
-        "x": 520,
-        "y": 340,
+        "x": 690,
+        "y": 200,
         "wires": [
             [
-                "ba11eb2d.684858",
                 "20c401ce.cc2c0e"
             ]
         ]
@@ -342,12 +123,12 @@
         "id": "8007c357.7ad99",
         "type": "function",
         "z": "3382f3e8.29c93c",
-        "name": "",
-        "func": "\nif (msg.payload &&\nmsg.payload.FaceMatches && \nmsg.payload.FaceMatches.length > 0)\n{\n    //save the facematches to put back in payload later:\n    msg.FaceMatches = msg.payload.FaceMatches\n    \n    var keys = msg.payload.FaceMatches.map(x => {\n        return {\n            \"RekognitionId\": {\n                S: x.Face.FaceId\n            }\n        }\n    });\n    \n    msg.RequestItems = {\n        \"face_collection\": {\n             Keys: keys//, \n             //ProjectionExpression: \"AlbumTitle\"\n            }\n          };\n\n    \n    \n    \n    // msg.Key = \n    // {\n    //   \"RekognitionId\": {\n    //         S: msg.payload.FaceMatches[0].Face.FaceId\n    //     }\n    // }\n}\n\nreturn msg;",
+        "name": "create dynamo request to map faceids to usernames",
+        "func": "\nif (msg.payload &&\nmsg.payload.FaceMatches && \nmsg.payload.FaceMatches.length > 0)\n{\n    //save the facematches to put back in payload later:\n    msg.FaceMatches = msg.payload.FaceMatches\n    \n    var keys = msg.payload.FaceMatches.map(x => {\n        return {\n            \"RekognitionId\": {\n                S: x.Face.FaceId\n            }\n        }\n    });\n    \n    msg.RequestItems = {\n        \"face_collection\": {\n             Keys: keys\n        }\n    };\n\n}\n\nreturn msg;",
         "outputs": 1,
         "noerr": 0,
-        "x": 310,
-        "y": 340,
+        "x": 340,
+        "y": 200,
         "wires": [
             [
                 "2915da68.305896"
@@ -355,49 +136,20 @@
         ]
     },
     {
-        "id": "ba11eb2d.684858",
-        "type": "debug",
-        "z": "3382f3e8.29c93c",
-        "name": "",
-        "active": false,
-        "tosidebar": true,
-        "console": false,
-        "tostatus": false,
-        "complete": "true",
-        "x": 1040,
-        "y": 340,
-        "wires": []
-    },
-    {
         "id": "20c401ce.cc2c0e",
         "type": "function",
         "z": "3382f3e8.29c93c",
-        "name": "",
+        "name": "Decide if User Matched or not.",
         "func": "var username = msg.req.params.username;\n\nmsg.payload.Authenticated = false;\nif (msg.payload.Responses.face_collection){\n    \n    matches = msg.payload.Responses.face_collection.filter(x => {\n        return x.FullName.S == username;\n    });\n    \n    if (matches.length == msg.payload.Responses.face_collection.length){\n        msg.payload.Authenticated = true;\n    }\n}\n\nif (msg.FaceMatches){\n    msg.payload.FaceMatches = msg.FaceMatches;\n}\n\n\nreturn msg;",
         "outputs": 1,
         "noerr": 0,
-        "x": 790,
-        "y": 400,
+        "x": 630,
+        "y": 300,
         "wires": [
             [
-                "ab75348c.b758a8",
                 "fa263938.c6f0e8"
             ]
         ]
-    },
-    {
-        "id": "ab75348c.b758a8",
-        "type": "debug",
-        "z": "3382f3e8.29c93c",
-        "name": "",
-        "active": true,
-        "tosidebar": true,
-        "console": false,
-        "tostatus": false,
-        "complete": "true",
-        "x": 1050,
-        "y": 400,
-        "wires": []
     },
     {
         "id": "d13dfc93.fcb39",
@@ -408,12 +160,12 @@
             "2915da68.305896",
             "189382fd.8648ad"
         ],
-        "x": 430,
-        "y": 440,
+        "x": 350,
+        "y": 380,
         "wires": [
             [
-                "4751dc18.9827d4",
-                "84c4b023.c17a8"
+                "8eff157d.d46828",
+                "664e9a96.c925a4"
             ]
         ]
     },
@@ -426,28 +178,9 @@
         "headers": {
             "content-type": "application/json"
         },
-        "x": 810,
-        "y": 440,
+        "x": 1140,
+        "y": 380,
         "wires": []
-    },
-    {
-        "id": "4751dc18.9827d4",
-        "type": "template",
-        "z": "3382f3e8.29c93c",
-        "name": "",
-        "field": "payload",
-        "fieldType": "msg",
-        "format": "handlebars",
-        "syntax": "mustache",
-        "template": "{\n    \"Authenticated\": false\n}",
-        "output": "str",
-        "x": 600,
-        "y": 440,
-        "wires": [
-            [
-                "2ade69fb.5aa106"
-            ]
-        ]
     },
     {
         "id": "fa263938.c6f0e8",
@@ -458,40 +191,226 @@
         "headers": {
             "content-type": "application/json"
         },
-        "x": 1060,
-        "y": 440,
+        "x": 860,
+        "y": 300,
         "wires": []
     },
     {
-        "id": "a70ea023.82b02",
+        "id": "a76be52f.e35598",
         "type": "http in",
         "z": "3382f3e8.29c93c",
         "name": "",
-        "url": "/hello",
+        "url": "/logIn",
         "method": "get",
         "upload": false,
         "swaggerDoc": "",
         "x": 100,
-        "y": 40,
+        "y": 500,
         "wires": [
             [
-                "740141f2.cdfba"
+                "bab108ec.e4b3b8"
             ]
         ]
     },
     {
-        "id": "740141f2.cdfba",
+        "id": "5268c42b.60ab7c",
         "type": "http response",
         "z": "3382f3e8.29c93c",
         "name": "",
-        "statusCode": "200",
+        "statusCode": "",
         "headers": {},
-        "x": 340,
-        "y": 40,
+        "x": 870,
+        "y": 500,
         "wires": []
     },
     {
-        "id": "84c4b023.c17a8",
+        "id": "bab108ec.e4b3b8",
+        "type": "template",
+        "z": "3382f3e8.29c93c",
+        "name": "Welcome Page Markdown",
+        "field": "payload",
+        "fieldType": "msg",
+        "format": "handlebars",
+        "syntax": "mustache",
+        "template": "# Welcome\n\nYou have fake logged in. Congrats!\n\nhttps://github.com/aaronpropst/rekoglog\n\n[Do it again!](/)",
+        "output": "str",
+        "x": 340,
+        "y": 500,
+        "wires": [
+            [
+                "6fbf52ef.a8dfec"
+            ]
+        ]
+    },
+    {
+        "id": "6fbf52ef.a8dfec",
+        "type": "markdown",
+        "z": "3382f3e8.29c93c",
+        "name": "Parse markdown to HTML",
+        "x": 620,
+        "y": 500,
+        "wires": [
+            [
+                "5268c42b.60ab7c"
+            ]
+        ]
+    },
+    {
+        "id": "9f9e509c.868ba",
+        "type": "http response",
+        "z": "e14d9b8d.0bf368",
+        "name": "",
+        "statusCode": "200",
+        "headers": {
+            "content-type": "application/json"
+        },
+        "x": 880,
+        "y": 80,
+        "wires": []
+    },
+    {
+        "id": "ad13e6a2.abd7a8",
+        "type": "AWS Rekognition",
+        "z": "e14d9b8d.0bf368",
+        "aws": "9c11537c.9739c",
+        "operation": "CompareFaces",
+        "SourceImage": "",
+        "TargetImage": "",
+        "CollectionId": "",
+        "Input": "",
+        "Output": "",
+        "Name": "",
+        "Settings": "",
+        "RoleArn": "",
+        "FaceIds": "",
+        "Image": "",
+        "Id": "",
+        "JobId": "",
+        "FaceId": "",
+        "Video": "",
+        "name": "",
+        "x": 560,
+        "y": 220,
+        "wires": [
+            [
+                "c3d8f48e.d8dd68",
+                "37769748.502f28"
+            ]
+        ]
+    },
+    {
+        "id": "c3d8f48e.d8dd68",
+        "type": "debug",
+        "z": "e14d9b8d.0bf368",
+        "name": "",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "x": 810,
+        "y": 220,
+        "wires": []
+    },
+    {
+        "id": "a1104d14.d3183",
+        "type": "file in",
+        "z": "e14d9b8d.0bf368",
+        "name": "",
+        "filename": "",
+        "format": "",
+        "chunk": false,
+        "sendError": false,
+        "x": 270,
+        "y": 140,
+        "wires": [
+            [
+                "7e596b2f.420114"
+            ]
+        ]
+    },
+    {
+        "id": "7e596b2f.420114",
+        "type": "function",
+        "z": "e14d9b8d.0bf368",
+        "name": "",
+        "func": "//var buff = Buffer.from(msg.payload);\n\nvar buff = msg.req.files[0].buffer;\n\n\nmsg.SourceImage = {\n    Bytes: buff\n};\nmsg.TargetImage= {\n    Bytes: msg.payload\n};\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 430,
+        "y": 140,
+        "wires": [
+            [
+                "ad13e6a2.abd7a8"
+            ]
+        ]
+    },
+    {
+        "id": "37769748.502f28",
+        "type": "json",
+        "z": "e14d9b8d.0bf368",
+        "name": "",
+        "property": "payload",
+        "action": "str",
+        "pretty": false,
+        "x": 690,
+        "y": 140,
+        "wires": [
+            [
+                "9f9e509c.868ba"
+            ]
+        ]
+    },
+    {
+        "id": "be7a15f.84905e8",
+        "type": "catch",
+        "z": "e14d9b8d.0bf368",
+        "name": "",
+        "scope": [
+            "ad13e6a2.abd7a8"
+        ],
+        "x": 500,
+        "y": 260,
+        "wires": [
+            [
+                "8190d108.b5521"
+            ]
+        ]
+    },
+    {
+        "id": "aa16674.d961b98",
+        "type": "http response",
+        "z": "e14d9b8d.0bf368",
+        "name": "",
+        "statusCode": "200",
+        "headers": {
+            "content-type": "application/json"
+        },
+        "x": 840,
+        "y": 260,
+        "wires": []
+    },
+    {
+        "id": "8190d108.b5521",
+        "type": "template",
+        "z": "e14d9b8d.0bf368",
+        "name": "",
+        "field": "payload",
+        "fieldType": "msg",
+        "format": "handlebars",
+        "syntax": "mustache",
+        "template": "{\n    \"FaceMatches\": [\n    ],\n    \"SourceImageFace\": {\n    },\n    \"SourceImageOrientationCorrection\": \"ROTATE_0\",\n    \"TargetImageOrientationCorrection\": \"ROTATE_0\",\n    \"UnmatchedFaces\": []\n}",
+        "output": "str",
+        "x": 630,
+        "y": 260,
+        "wires": [
+            [
+                "aa16674.d961b98"
+            ]
+        ]
+    },
+    {
+        "id": "8eff157d.d46828",
         "type": "debug",
         "z": "3382f3e8.29c93c",
         "name": "",
@@ -500,8 +419,61 @@
         "console": false,
         "tostatus": false,
         "complete": "true",
-        "x": 610,
-        "y": 520,
+        "x": 480,
+        "y": 440,
         "wires": []
+    },
+    {
+        "id": "5a757ae7.b030d4",
+        "type": "debug",
+        "z": "3382f3e8.29c93c",
+        "name": "",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "x": 970,
+        "y": 40,
+        "wires": []
+    },
+    {
+        "id": "ca20acff.4d2d4",
+        "type": "function",
+        "z": "3382f3e8.29c93c",
+        "name": "Faces Present?",
+        "func": "if (msg.payload.FaceMatches &&\nmsg.payload.FaceMatches.length == 0){\n    msg.error = {\n        message: \"No faces matched\"\n    };\n    return [null,msg]\n    \n}else{\n    return [msg,null]\n}\nreturn msg;",
+        "outputs": 2,
+        "noerr": 0,
+        "x": 1040,
+        "y": 100,
+        "wires": [
+            [
+                "8007c357.7ad99"
+            ],
+            [
+                "664e9a96.c925a4"
+            ]
+        ],
+        "outputLabels": [
+            "matches",
+            "no matches"
+        ]
+    },
+    {
+        "id": "664e9a96.c925a4",
+        "type": "function",
+        "z": "3382f3e8.29c93c",
+        "name": "Authenticated: false",
+        "func": "msg.payload.Authenticated = false\n\nif (msg.error){\n    msg.payload[\"Error\"] = msg.error.message;\n}\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 870,
+        "y": 380,
+        "wires": [
+            [
+                "2ade69fb.5aa106"
+            ]
+        ]
     }
 ]
