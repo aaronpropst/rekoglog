@@ -37,6 +37,95 @@
         "wholemsg": "false"
     },
     {
+        "id": "d66ae98e.4202d8",
+        "type": "ui_base",
+        "theme": {
+            "name": "theme-light",
+            "lightTheme": {
+                "default": "#0094CE",
+                "baseColor": "#0094CE",
+                "baseFont": "-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Oxygen-Sans,Ubuntu,Cantarell,Helvetica Neue,sans-serif",
+                "edited": true,
+                "reset": false
+            },
+            "darkTheme": {
+                "default": "#097479",
+                "baseColor": "#097479",
+                "baseFont": "-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Oxygen-Sans,Ubuntu,Cantarell,Helvetica Neue,sans-serif",
+                "edited": false
+            },
+            "customTheme": {
+                "name": "Untitled Theme 1",
+                "default": "#4B7930",
+                "baseColor": "#4B7930",
+                "baseFont": "-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Oxygen-Sans,Ubuntu,Cantarell,Helvetica Neue,sans-serif"
+            },
+            "themeState": {
+                "base-color": {
+                    "default": "#0094CE",
+                    "value": "#0094CE",
+                    "edited": false
+                },
+                "page-titlebar-backgroundColor": {
+                    "value": "#0094CE",
+                    "edited": false
+                },
+                "page-backgroundColor": {
+                    "value": "#fafafa",
+                    "edited": false
+                },
+                "page-sidebar-backgroundColor": {
+                    "value": "#ffffff",
+                    "edited": false
+                },
+                "group-textColor": {
+                    "value": "#1bbfff",
+                    "edited": false
+                },
+                "group-borderColor": {
+                    "value": "#ffffff",
+                    "edited": false
+                },
+                "group-backgroundColor": {
+                    "value": "#ffffff",
+                    "edited": false
+                },
+                "widget-textColor": {
+                    "value": "#111111",
+                    "edited": false
+                },
+                "widget-backgroundColor": {
+                    "value": "#0094ce",
+                    "edited": false
+                },
+                "widget-borderColor": {
+                    "value": "#ffffff",
+                    "edited": false
+                },
+                "base-font": {
+                    "value": "-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Oxygen-Sans,Ubuntu,Cantarell,Helvetica Neue,sans-serif"
+                }
+            }
+        },
+        "site": {
+            "name": "Node-RED Dashboard",
+            "hideToolbar": "false",
+            "allowSwipe": "false",
+            "allowTempTheme": "true",
+            "dateFormat": "DD/MM/YYYY",
+            "sizes": {
+                "sx": 48,
+                "sy": 48,
+                "gx": 6,
+                "gy": 6,
+                "cx": 6,
+                "cy": 6,
+                "px": 0,
+                "py": 0
+            }
+        }
+    },
+    {
         "id": "84a19310.dce7f",
         "type": "http in",
         "z": "3382f3e8.29c93c",
@@ -563,14 +652,15 @@
         "type": "function",
         "z": "48d2709e.65773",
         "name": "build aws request",
-        "func": "//var buff = Buffer.from(msg.payload);\n\n//var buff = msg.req.files[0].buffer;\n\n\nmsg.Image = {\n    Bytes: msg.payload\n};\n\nreturn msg;",
+        "func": "//var buff = Buffer.from(msg.payload);\n\n//var buff = msg.req.files[0].buffer;\n\n\nmsg.Image = {\n    Bytes: msg.payload\n};\n\nmsg.Attributes = [ 'ALL' ]\nreturn msg;",
         "outputs": 1,
         "noerr": 0,
         "x": 410,
         "y": 100,
         "wires": [
             [
-                "c2c67543.54fc78"
+                "c2c67543.54fc78",
+                "1db07027.0a0e3"
             ]
         ]
     },
@@ -666,8 +756,7 @@
         "y": 200,
         "wires": [
             [
-                "40f20abd.041354",
-                "982b1baf.608d78"
+                "40f20abd.041354"
             ]
         ]
     },
@@ -752,8 +841,7 @@
         "y": 420,
         "wires": [
             [
-                "40f20abd.041354",
-                "e7661301.ed394"
+                "40f20abd.041354"
             ]
         ]
     },
@@ -785,31 +873,47 @@
         ]
     },
     {
-        "id": "e7661301.ed394",
-        "type": "debug",
+        "id": "1db07027.0a0e3",
+        "type": "AWS Rekognition",
         "z": "48d2709e.65773",
+        "aws": "9c11537c.9739c",
+        "operation": "DetectFaces",
+        "SourceImage": "",
+        "TargetImage": "",
+        "CollectionId": "",
+        "Input": "",
+        "Output": "",
+        "Name": "",
+        "Settings": "",
+        "RoleArn": "",
+        "FaceIds": "",
+        "Image": "",
+        "Id": "",
+        "JobId": "",
+        "FaceId": "",
+        "Video": "",
         "name": "",
-        "active": true,
-        "tosidebar": true,
-        "console": false,
-        "tostatus": false,
-        "complete": "true",
-        "x": 1271,
-        "y": 394,
-        "wires": []
+        "x": 550,
+        "y": 300,
+        "wires": [
+            [
+                "6261d8.c78a0e28",
+                "40f20abd.041354"
+            ]
+        ]
     },
     {
-        "id": "982b1baf.608d78",
+        "id": "6261d8.c78a0e28",
         "type": "debug",
         "z": "48d2709e.65773",
         "name": "",
-        "active": true,
+        "active": false,
         "tosidebar": true,
         "console": false,
         "tostatus": false,
         "complete": "true",
-        "x": 1290,
-        "y": 200,
+        "x": 670,
+        "y": 460,
         "wires": []
     }
 ]

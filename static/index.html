@@ -13,7 +13,7 @@
 		#video {
 			border: 1px solid black;
 			box-shadow: 2px 2px 3px black;
-			width:313px;
+			width:320px;
 			height:240px;
 		}
 
@@ -24,9 +24,6 @@
 			height:240px;
 		}
 
-		#canvas {
-			display:none;
-		}
 
 		.camera {
 			width: 340px;
@@ -62,11 +59,8 @@
 			text-align: right;
 			display: inline-block;
 		}
-		#canvas{
-			display: none;
-		}
 		#contentarea.container{
-			width: 800px;
+			/* width: 800px; */
 			margin-left: auto;
 			margin-right: auto;
 			margin-top: 4em;
@@ -88,31 +82,48 @@
 		#photo.authorized{
 			border: 10px solid green;
 		}
+
+		.preformatted {
+			font-family: monospace;
+			white-space: pre;
+		}
 	</style>
 </head>
 <body>
 <div id="contentarea" class="contentarea container">
 	<div class="row">
 		<div class="lform col-sm">
-		<form action="logIn">
+		<form id="login" action="logIn">
 			<label for="username">Username:</label> <input id="username" name="username" type="text" /><br/>
-			<label for="password">Password:</label> <input name="password" type="password" /><br/>
+			<label for="password">Password:</label> <input id="password" name="password" type="password" /><br/>
 			<input id="loginButton" type="submit" value="Log In" disabled="true" />
 		</form>
 		</div>
 
 		<div class="camera col-sm">
-			<video id="video">Video stream not available.</video>
+			<canvas id="video"></canvas>
+			<!-- <video id="video">Video stream not available.</video> -->
 			<!--<button id="startbutton">Take photo</button> -->
 		</div>
 
 	</div>
 	<div class="row">
 		<div class="col-sm">
-			<div id="stats"></div>
+			<div id="stats" class="preformatted"></div>
+		</div>
+		<div class="col-sm">
+			<div id="todo" class="preformatted">
+[ ] handle websocket disconnects
+[ ] deal with username properly
+[ ] Slow down auth calls when verified
+[ ] Require password before verify
+[ ] Rig up 'Are you still there?'
+			</div>
 		</div>
 	</div>
-
+	<div class="row">
+	</div>
+			
 </div>
 
 

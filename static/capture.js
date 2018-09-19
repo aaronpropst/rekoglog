@@ -19,14 +19,21 @@
   var photo = null;
   var startbutton = null;
   var context = null;
-
+  var outputCanvas = null;
+  var outputContext = null;
+  var faceRect = null;
+  var landmarks = null;
   var videoSetUp = false;
 
   const socket = new WebSocket('ws://localhost:1880/ws/');
 
 
   function startup() {
-    video = document.getElementById('video');
+    outputCanvas = document.getElementById('video');
+    outputContext = outputCanvas.getContext('2d');
+    video = document.createElement('video');
+    video.width = 1024; //outputCanvas.width;
+    video.height = 768; //outputCanvas.height;
     canvas = document.createElement('canvas');
     context = canvas.getContext('2d');
     photo = document.createElement('image');;
@@ -43,7 +50,7 @@
       }else{
         $("#video").hide();
       }
-		},500);    
+		},2000);    
 
   }
 
@@ -74,25 +81,45 @@
         console.log("An error occured! " + err);
       }
     );
+    
+    video.addEventListener('play', function () {
+      var $this = this; //cache
+      (function loop() {
+          if (!$this.paused && !$this.ended) {
 
-    video.addEventListener('canplay', function(ev){
-      if (!streaming) {
-        height = video.videoHeight / (video.videoWidth/width);
-      
-        // Firefox currently has a bug where the height can't be read from
-        // the video, so we will make assumptions if this happens.
-      
-        if (isNaN(height)) {
-          height = width / (4/3);
-        }
-      
-        video.setAttribute('width', width);
-        video.setAttribute('height', height);
-        canvas.setAttribute('width', width);
-        canvas.setAttribute('height', height);
-        streaming = true;
-      }
-    }, false);
+              outputContext.clearRect(0, 0, outputCanvas.width,outputCanvas.height);
+              outputContext.drawImage($this, 0, 0,outputCanvas.width,outputCanvas.height);
+              if (faceRect){
+                outputContext.beginPath();
+                outputContext.strokeStyle="#FFFF00";
+                outputContext.lineWidth="2px";
+                outputContext.rect(
+                  Math.floor(outputCanvas.width * faceRect.Left),
+                  Math.floor(outputCanvas.height * faceRect.Top), 
+                  Math.floor(outputCanvas.width * faceRect.Width), 
+                  Math.floor(outputCanvas.height * faceRect.Height)
+                );
+              }
+              // if (landmarks){
+              //   outputContext.fillRect(
+              //     Math.floor(outputCanvas.width * landmarks[5].X),
+              //     Math.floor(outputCanvas.height * landmarks[5].Y),
+              //     2,
+              //     2
+              //   );
+              //   outputContext.fillRect(
+              //     Math.floor(outputCanvas.width * landmarks[6].X),
+              //     Math.floor(outputCanvas.height * landmarks[6].Y),
+              //     2,
+              //     2
+              //   );
+              // }
+              outputContext.stroke();
+              setTimeout(loop, 1000 / 30); // drawing at 30fps
+          }
+      })();
+    }, 0);
+
 		
 		videoSetUp = true;
 	}
@@ -134,10 +161,9 @@ function dataURItoBlob(dataURI) {
 
   function takepicture() {
     var context = canvas.getContext('2d');
-    if (width && height) {
-      canvas.width = width;
-      canvas.height = height;
-      context.drawImage(video, 0, 0, width, height);
+      canvas.width = outputCanvas.width;
+      canvas.height = outputCanvas.height;
+      context.drawImage(video, 0, 0, outputCanvas.width, outputCanvas.height);
     
       var data = canvas.toDataURL('image/png');
       photo.setAttribute('src', data);
@@ -148,9 +174,6 @@ function dataURItoBlob(dataURI) {
       fd.append("canvasImage", blob);
       socket.send(blob);
       
-    } else {
-      clearphoto();
-    }
   }
 	
 	function setAuthorized(isAuthorized){
@@ -172,18 +195,44 @@ function dataURItoBlob(dataURI) {
 		//socket.send('Hello Server!');
 	});
 
+	socket.addEventListener('close', function (event) {
+    //socket.send('Hello Server!');
+    
+	});
+
+
 	// Listen for messages
 	socket.addEventListener('message', function (event) {
     
     try{
       var resp = JSON.parse(event.data);
-      setAuthorized(resp.Authenticated == true);
 
-      if (resp.FaceMatches && resp.FaceMatches.length > 0){
-        var bb = resp.FaceMatches[0].Face.BoundingBox;
-        context.rect(canvas.width * bb.Left,canvas.height * bb.Top, canvas.width * bb.Width, canvas.height * bb.Height);
-        context.stroke();
+      if (typeof resp.Authenticated === 'boolean'){
+        setAuthorized(resp.Authenticated == true);
       }
+      
+
+      if (resp.FaceDetails && resp.FaceDetails.length >0){
+        var deets = resp.FaceDetails[0];
+        var bb = deets.BoundingBox;
+        faceRect = bb;
+
+        onlySure=(x)=>{
+          return x.Confidence > 80 ? x.Value : undefined;
+        }
+
+        var stats = {
+          AgeRange: deets.AgeRange,
+          Beard: onlySure(deets.Beard),
+          Mustache: onlySure(deets.Mustache),
+          Eyeglasses: onlySure(deets.Eyeglasses),
+          Gender: onlySure(deets.Gender),
+          Emotion: deets.Emotions[0].Type
+        }
+        landmarks = deets.Landmarks;
+        $('#stats').text(JSON.stringify(stats,null,4));
+      }
+
 
       console.log(resp);
     }
