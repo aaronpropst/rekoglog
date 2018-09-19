@@ -14,13 +14,27 @@
         "info": ""
     },
     {
+        "id": "48d2709e.65773",
+        "type": "tab",
+        "label": "Flow 2",
+        "disabled": false,
+        "info": ""
+    },
+    {
         "id": "9c11537c.9739c",
         "type": "amazon config",
         "z": "",
-        "name": "AWS-aaron",
+        "name": "AWS",
         "region": "us-west-2",
         "proxyRequired": false,
         "proxy": ""
+    },
+    {
+        "id": "5e64d2a8.ee4fec",
+        "type": "websocket-listener",
+        "z": "",
+        "path": "/ws/",
+        "wholemsg": "false"
     },
     {
         "id": "84a19310.dce7f",
@@ -178,7 +192,7 @@
         "headers": {
             "content-type": "application/json"
         },
-        "x": 1140,
+        "x": 1120,
         "y": 380,
         "wires": []
     },
@@ -475,5 +489,327 @@
                 "2ade69fb.5aa106"
             ]
         ]
+    },
+    {
+        "id": "ece50179.d35bd",
+        "type": "AWS Rekognition",
+        "z": "3382f3e8.29c93c",
+        "aws": "9c11537c.9739c",
+        "operation": "CreateStreamProcessor",
+        "SourceImage": "",
+        "TargetImage": "",
+        "CollectionId": "",
+        "Input": "",
+        "Output": "",
+        "Name": "",
+        "Settings": "",
+        "RoleArn": "",
+        "FaceIds": "",
+        "Image": "",
+        "Id": "",
+        "JobId": "",
+        "FaceId": "",
+        "Video": "",
+        "name": "",
+        "x": 610,
+        "y": 660,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "92f28672.2b6ce8",
+        "type": "websocket in",
+        "z": "48d2709e.65773",
+        "name": "",
+        "server": "5e64d2a8.ee4fec",
+        "client": "",
+        "x": 140,
+        "y": 40,
+        "wires": [
+            [
+                "85f2b544.627958",
+                "55d8935.bf4eb6c"
+            ]
+        ]
+    },
+    {
+        "id": "40f20abd.041354",
+        "type": "websocket out",
+        "z": "48d2709e.65773",
+        "name": "",
+        "server": "5e64d2a8.ee4fec",
+        "client": "",
+        "x": 1260,
+        "y": 320,
+        "wires": []
+    },
+    {
+        "id": "85f2b544.627958",
+        "type": "debug",
+        "z": "48d2709e.65773",
+        "name": "",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "x": 530,
+        "y": 40,
+        "wires": []
+    },
+    {
+        "id": "55d8935.bf4eb6c",
+        "type": "function",
+        "z": "48d2709e.65773",
+        "name": "build aws request",
+        "func": "//var buff = Buffer.from(msg.payload);\n\n//var buff = msg.req.files[0].buffer;\n\n\nmsg.Image = {\n    Bytes: msg.payload\n};\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 410,
+        "y": 100,
+        "wires": [
+            [
+                "c2c67543.54fc78"
+            ]
+        ]
+    },
+    {
+        "id": "c2c67543.54fc78",
+        "type": "AWS Rekognition",
+        "z": "48d2709e.65773",
+        "aws": "9c11537c.9739c",
+        "operation": "SearchFacesByImage",
+        "SourceImage": "",
+        "TargetImage": "",
+        "CollectionId": "face_collection",
+        "Input": "",
+        "Output": "",
+        "Name": "",
+        "Settings": "",
+        "RoleArn": "",
+        "FaceIds": "",
+        "Image": "",
+        "Id": "",
+        "JobId": "",
+        "FaceId": "",
+        "Video": "",
+        "name": "",
+        "x": 720,
+        "y": 100,
+        "wires": [
+            [
+                "ce8a4335.e93c5",
+                "284637ac.402eb8"
+            ]
+        ]
+    },
+    {
+        "id": "d500a692.cd4dc8",
+        "type": "AWS DynamoDB",
+        "z": "48d2709e.65773",
+        "aws": "9c11537c.9739c",
+        "operation": "BatchGetItem",
+        "RequestItems": "",
+        "TableName": "face_collection",
+        "BackupName": "",
+        "GlobalTableName": "",
+        "ReplicationGroup": "",
+        "AttributeDefinitions": "",
+        "KeySchema": "",
+        "ProvisionedThroughput": "",
+        "BackupArn": "",
+        "Key": "",
+        "ResourceArn": "",
+        "Item": "",
+        "TargetTableName": "",
+        "SourceTableName": "",
+        "Tags": "",
+        "TagKeys": "",
+        "PointInTimeRecoverySpecification": "",
+        "ReplicaUpdates": "",
+        "TimeToLiveSpecification": "",
+        "name": "",
+        "x": 730,
+        "y": 200,
+        "wires": [
+            [
+                "80bde927.868018"
+            ]
+        ]
+    },
+    {
+        "id": "785fd9d.5deee28",
+        "type": "function",
+        "z": "48d2709e.65773",
+        "name": "create dynamo request to map faceids to usernames",
+        "func": "\nif (msg.payload &&\nmsg.payload.FaceMatches && \nmsg.payload.FaceMatches.length > 0)\n{\n    //save the facematches to put back in payload later:\n    msg.FaceMatches = msg.payload.FaceMatches\n    \n    var keys = msg.payload.FaceMatches.map(x => {\n        return {\n            \"RekognitionId\": {\n                S: x.Face.FaceId\n            }\n        }\n    });\n    \n    msg.RequestItems = {\n        \"face_collection\": {\n             Keys: keys\n        }\n    };\n\n}\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 360,
+        "y": 200,
+        "wires": [
+            [
+                "d500a692.cd4dc8"
+            ]
+        ]
+    },
+    {
+        "id": "80bde927.868018",
+        "type": "function",
+        "z": "48d2709e.65773",
+        "name": "Decide if User Matched or not.",
+        "func": "var username = 'aaronpropst'//msg.req.params.username;\n\nmsg.payload.Authenticated = false;\nif (msg.payload.Responses.face_collection){\n    \n    matches = msg.payload.Responses.face_collection.filter(x => {\n        return x.FullName.S == username;\n    });\n    \n    if (matches.length == msg.payload.Responses.face_collection.length){\n        msg.payload.Authenticated = true;\n    }\n}\n\nif (msg.FaceMatches){\n    msg.payload.FaceMatches = msg.FaceMatches;\n}\n\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 1050,
+        "y": 200,
+        "wires": [
+            [
+                "40f20abd.041354",
+                "982b1baf.608d78"
+            ]
+        ]
+    },
+    {
+        "id": "837c39df.c386b8",
+        "type": "catch",
+        "z": "48d2709e.65773",
+        "name": "",
+        "scope": [
+            "d500a692.cd4dc8",
+            "c2c67543.54fc78"
+        ],
+        "x": 810,
+        "y": 360,
+        "wires": [
+            [
+                "bcc14d33.fe849",
+                "65053809.6d4458"
+            ]
+        ]
+    },
+    {
+        "id": "bcc14d33.fe849",
+        "type": "debug",
+        "z": "48d2709e.65773",
+        "name": "",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "x": 1010,
+        "y": 580,
+        "wires": []
+    },
+    {
+        "id": "ce8a4335.e93c5",
+        "type": "debug",
+        "z": "48d2709e.65773",
+        "name": "",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "x": 1030,
+        "y": 40,
+        "wires": []
+    },
+    {
+        "id": "284637ac.402eb8",
+        "type": "function",
+        "z": "48d2709e.65773",
+        "name": "Faces Present?",
+        "func": "if (msg.payload.FaceMatches &&\nmsg.payload.FaceMatches.length == 0){\n    msg.error = {\n        message: \"No faces matched\"\n    };\n    return [null,msg]\n    \n}else{\n    return [msg,null]\n}\nreturn msg;",
+        "outputs": 2,
+        "noerr": 0,
+        "x": 1000,
+        "y": 100,
+        "wires": [
+            [
+                "785fd9d.5deee28"
+            ],
+            [
+                "65053809.6d4458"
+            ]
+        ],
+        "outputLabels": [
+            "matches",
+            "no matches"
+        ]
+    },
+    {
+        "id": "65053809.6d4458",
+        "type": "function",
+        "z": "48d2709e.65773",
+        "name": "Authenticated: false",
+        "func": "msg.payload = {}\nmsg.payload.Authenticated = false\n\nif (msg.error){\n    msg.payload[\"Error\"] = msg.error.message;\n}\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 1060,
+        "y": 420,
+        "wires": [
+            [
+                "40f20abd.041354",
+                "e7661301.ed394"
+            ]
+        ]
+    },
+    {
+        "id": "d232f718.b81fe8",
+        "type": "AWS Rekognition",
+        "z": "48d2709e.65773",
+        "aws": "9c11537c.9739c",
+        "operation": "CreateStreamProcessor",
+        "SourceImage": "",
+        "TargetImage": "",
+        "CollectionId": "",
+        "Input": "",
+        "Output": "",
+        "Name": "",
+        "Settings": "",
+        "RoleArn": "",
+        "FaceIds": "",
+        "Image": "",
+        "Id": "",
+        "JobId": "",
+        "FaceId": "",
+        "Video": "",
+        "name": "",
+        "x": 670,
+        "y": 920,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "e7661301.ed394",
+        "type": "debug",
+        "z": "48d2709e.65773",
+        "name": "",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "x": 1271,
+        "y": 394,
+        "wires": []
+    },
+    {
+        "id": "982b1baf.608d78",
+        "type": "debug",
+        "z": "48d2709e.65773",
+        "name": "",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "x": 1290,
+        "y": 200,
+        "wires": []
     }
 ]

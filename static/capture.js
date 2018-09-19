@@ -18,14 +18,18 @@
   var canvas = null;
   var photo = null;
   var startbutton = null;
+  var context = null;
 
   var videoSetUp = false;
+
+  const socket = new WebSocket('ws://localhost:1880/ws/');
 
 
   function startup() {
     video = document.getElementById('video');
-    canvas = document.getElementById('canvas');
-    photo = document.getElementById('photo');
+    canvas = document.createElement('canvas');
+    context = canvas.getContext('2d');
+    photo = document.createElement('image');;
     
     clearphoto();
 
@@ -39,7 +43,7 @@
       }else{
         $("#video").hide();
       }
-		},4000);    
+		},500);    
 
   }
 
@@ -102,7 +106,6 @@
   // captured.
 
   function clearphoto() {
-    var context = canvas.getContext('2d');
     context.fillStyle = "#AAA";
     context.fillRect(0, 0, canvas.width, canvas.height);
 
@@ -139,30 +142,12 @@ function dataURItoBlob(dataURI) {
       var data = canvas.toDataURL('image/png');
       photo.setAttribute('src', data);
 
-    var blob = dataURItoBlob(data);
-    var fd = new FormData();
+      var blob = dataURItoBlob(data);
+      var fd = new FormData();
 
-    fd.append("canvasImage", blob);
-
-    var jqxhr = $.post({
-      url: "/imageUp/" + $('#username').val(),
-      cache: false,
-      contentType: false,
-      processData: false,
-      timeout: 4000,
-      data: fd
-    })
-    .done(function(resp) {
-      console.log(resp);
-			setAuthorized(resp.Authenticated == true);
-    })
-    .fail(function(error) {
-	    console.log(error);
-    })
-    .always(function() {
-    });
-
-
+      fd.append("canvasImage", blob);
+      socket.send(blob);
+      
     } else {
       clearphoto();
     }
@@ -178,6 +163,35 @@ function dataURItoBlob(dataURI) {
 		
 		}
 	}
+
+
+
+
+	// Connection opened
+	socket.addEventListener('open', function (event) {
+		//socket.send('Hello Server!');
+	});
+
+	// Listen for messages
+	socket.addEventListener('message', function (event) {
+    
+    try{
+      var resp = JSON.parse(event.data);
+      setAuthorized(resp.Authenticated == true);
+
+      if (resp.FaceMatches && resp.FaceMatches.length > 0){
+        var bb = resp.FaceMatches[0].Face.BoundingBox;
+        context.rect(canvas.width * bb.Left,canvas.height * bb.Top, canvas.width * bb.Width, canvas.height * bb.Height);
+        context.stroke();
+      }
+
+      console.log(resp);
+    }
+    catch{
+      console.log(event.data);
+    }
+	});
+
 
   // Set up our event listener to run the startup process
   // once loading is complete.
