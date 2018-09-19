@@ -38,6 +38,19 @@
     context = canvas.getContext('2d');
     photo = document.createElement('image');;
     
+    $("#login").submit(function() {
+      
+      if (socket.OPEN){
+        socket.send(JSON.stringify({
+          Login: true,
+          Username: $("#username").val(),
+          Password: $("#password").val()
+        }))
+      }else{
+        console.error("Socket wasn't open.  Can't submit form.");
+      }
+    });
+
     clearphoto();
 
 		setInterval(()=>{

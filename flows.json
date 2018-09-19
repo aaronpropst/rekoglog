@@ -617,8 +617,7 @@
         "y": 40,
         "wires": [
             [
-                "85f2b544.627958",
-                "55d8935.bf4eb6c"
+                "bb4a9347.b009f"
             ]
         ]
     },
@@ -638,13 +637,13 @@
         "type": "debug",
         "z": "48d2709e.65773",
         "name": "",
-        "active": false,
+        "active": true,
         "tosidebar": true,
         "console": false,
         "tostatus": false,
         "complete": "true",
-        "x": 530,
-        "y": 40,
+        "x": 350,
+        "y": 360,
         "wires": []
     },
     {
@@ -655,8 +654,8 @@
         "func": "//var buff = Buffer.from(msg.payload);\n\n//var buff = msg.req.files[0].buffer;\n\n\nmsg.Image = {\n    Bytes: msg.payload\n};\n\nmsg.Attributes = [ 'ALL' ]\nreturn msg;",
         "outputs": 1,
         "noerr": 0,
-        "x": 410,
-        "y": 100,
+        "x": 450,
+        "y": 40,
         "wires": [
             [
                 "c2c67543.54fc78",
@@ -686,10 +685,9 @@
         "Video": "",
         "name": "",
         "x": 720,
-        "y": 100,
+        "y": 40,
         "wires": [
             [
-                "ce8a4335.e93c5",
                 "284637ac.402eb8"
             ]
         ]
@@ -749,7 +747,7 @@
         "type": "function",
         "z": "48d2709e.65773",
         "name": "Decide if User Matched or not.",
-        "func": "var username = 'aaronpropst'//msg.req.params.username;\n\nmsg.payload.Authenticated = false;\nif (msg.payload.Responses.face_collection){\n    \n    matches = msg.payload.Responses.face_collection.filter(x => {\n        return x.FullName.S == username;\n    });\n    \n    if (matches.length == msg.payload.Responses.face_collection.length){\n        msg.payload.Authenticated = true;\n    }\n}\n\nif (msg.FaceMatches){\n    msg.payload.FaceMatches = msg.FaceMatches;\n}\n\n\nreturn msg;",
+        "func": "smap = global.get(\"sessionMap\");\nvar username = smap[msg._session.id] ? smap[msg._session.id] : \"\";\n\n\nmsg.payload.Authenticated = false;\nif (msg.payload.Responses.face_collection){\n    \n    matches = msg.payload.Responses.face_collection.filter(x => {\n        return x.FullName.S == username;\n    });\n    \n    if (matches.length == msg.payload.Responses.face_collection.length){\n        msg.payload.Authenticated = true;\n    }\n}\n\nif (msg.FaceMatches){\n    msg.payload.FaceMatches = msg.FaceMatches;\n}\n\n\nreturn msg;",
         "outputs": 1,
         "noerr": 0,
         "x": 1050,
@@ -769,42 +767,13 @@
             "d500a692.cd4dc8",
             "c2c67543.54fc78"
         ],
-        "x": 810,
-        "y": 360,
+        "x": 850,
+        "y": 420,
         "wires": [
             [
-                "bcc14d33.fe849",
                 "65053809.6d4458"
             ]
         ]
-    },
-    {
-        "id": "bcc14d33.fe849",
-        "type": "debug",
-        "z": "48d2709e.65773",
-        "name": "",
-        "active": true,
-        "tosidebar": true,
-        "console": false,
-        "tostatus": false,
-        "complete": "true",
-        "x": 1010,
-        "y": 580,
-        "wires": []
-    },
-    {
-        "id": "ce8a4335.e93c5",
-        "type": "debug",
-        "z": "48d2709e.65773",
-        "name": "",
-        "active": false,
-        "tosidebar": true,
-        "console": false,
-        "tostatus": false,
-        "complete": "true",
-        "x": 1030,
-        "y": 40,
-        "wires": []
     },
     {
         "id": "284637ac.402eb8",
@@ -897,23 +866,80 @@
         "y": 300,
         "wires": [
             [
-                "6261d8.c78a0e28",
                 "40f20abd.041354"
             ]
         ]
     },
     {
-        "id": "6261d8.c78a0e28",
-        "type": "debug",
+        "id": "bb4a9347.b009f",
+        "type": "function",
+        "z": "48d2709e.65773",
+        "name": "Image Fork",
+        "func": "if (typeof msg.payload === 'string'){\n    return [null,msg]\n}else{\n    return [msg, null]\n}\nreturn msg;",
+        "outputs": 2,
+        "noerr": 0,
+        "x": 280,
+        "y": 100,
+        "wires": [
+            [
+                "55d8935.bf4eb6c"
+            ],
+            [
+                "b4e37c2.18b128"
+            ]
+        ],
+        "outputLabels": [
+            "Is Buffer",
+            "Not Buffer"
+        ]
+    },
+    {
+        "id": "e3c6e62d.e93be8",
+        "type": "function",
+        "z": "48d2709e.65773",
+        "name": "map _session.id to username",
+        "func": "smap = global.get(\"sessionMap\");\n\nsmap[msg._session.id] = msg.Username\n\nglobal.set(\"sessionMap\", smap)\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 430,
+        "y": 440,
+        "wires": [
+            [
+                "d0b4699d.07d798"
+            ]
+        ]
+    },
+    {
+        "id": "b4e37c2.18b128",
+        "type": "json",
         "z": "48d2709e.65773",
         "name": "",
-        "active": false,
-        "tosidebar": true,
-        "console": false,
-        "tostatus": false,
-        "complete": "true",
-        "x": 670,
-        "y": 460,
-        "wires": []
+        "property": "payload",
+        "action": "",
+        "pretty": false,
+        "x": 180,
+        "y": 400,
+        "wires": [
+            [
+                "e3c6e62d.e93be8",
+                "85f2b544.627958"
+            ]
+        ]
+    },
+    {
+        "id": "d0b4699d.07d798",
+        "type": "function",
+        "z": "48d2709e.65773",
+        "name": "Logged In Message",
+        "func": "msg.payload = {\n    LoggedIn: true\n}\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 780,
+        "y": 360,
+        "wires": [
+            [
+                "40f20abd.041354"
+            ]
+        ]
     }
 ]
