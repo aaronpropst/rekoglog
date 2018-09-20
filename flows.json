@@ -617,7 +617,8 @@
         "y": 40,
         "wires": [
             [
-                "bb4a9347.b009f"
+                "bb4a9347.b009f",
+                "d5ff2d3e.971a3"
             ]
         ]
     },
@@ -747,7 +748,7 @@
         "type": "function",
         "z": "48d2709e.65773",
         "name": "Decide if User Matched or not.",
-        "func": "smap = global.get(\"sessionMap\");\nvar username = smap[msg._session.id] ? smap[msg._session.id] : \"\";\n\n\nmsg.payload.Authenticated = false;\nif (msg.payload.Responses.face_collection){\n    \n    matches = msg.payload.Responses.face_collection.filter(x => {\n        return x.FullName.S == username;\n    });\n    \n    if (matches.length == msg.payload.Responses.face_collection.length){\n        msg.payload.Authenticated = true;\n    }\n}\n\nif (msg.FaceMatches){\n    msg.payload.FaceMatches = msg.FaceMatches;\n}\n\n\nreturn msg;",
+        "func": "smap = global.get(\"sessionMap\");\nif (!smap){\n    smap = {};\n    global.set(\"sessionMap\",smap);\n}\n\n\nvar username;\nif (typeof smap[msg._session.id]!=='undefined'){\n    username = smap[msg._session.id];\n}else{\n    username = \"\";\n}\n\n\nmsg.payload.Authenticated = false;\nif (msg.payload.Responses.face_collection){\n    \n    matches = msg.payload.Responses.face_collection.filter(x => {\n        return x.FullName.S == username;\n    });\n    \n    if (matches.length == msg.payload.Responses.face_collection.length){\n        msg.payload.Authenticated = true;\n    }\n}\n\nif (msg.FaceMatches){\n    msg.payload.FaceMatches = msg.FaceMatches;\n}\n\n\nreturn msg;",
         "outputs": 1,
         "noerr": 0,
         "x": 1050,
@@ -898,7 +899,7 @@
         "type": "function",
         "z": "48d2709e.65773",
         "name": "map _session.id to username",
-        "func": "smap = global.get(\"sessionMap\");\n\nsmap[msg._session.id] = msg.Username\n\nglobal.set(\"sessionMap\", smap)\n\nreturn msg;",
+        "func": "smap = global.get(\"sessionMap\");\nif (!smap) smap = {};\n\nsmap[msg._session.id] = msg.payload.Username\n\nglobal.set(\"sessionMap\", smap)\n\nreturn msg;",
         "outputs": 1,
         "noerr": 0,
         "x": 430,
@@ -931,15 +932,29 @@
         "type": "function",
         "z": "48d2709e.65773",
         "name": "Logged In Message",
-        "func": "msg.payload = {\n    LoggedIn: true\n}\nreturn msg;",
+        "func": "smap = global.get(\"sessionMap\");\nif (!smap){\n    smap = {};\n    global.set(\"sessionMap\",smap);\n}\n\n\nmsg.payload = {\n    LoggedIn: true,\n    UserName: smap[msg._session.id]\n}\nreturn msg;",
         "outputs": 1,
         "noerr": 0,
         "x": 780,
-        "y": 360,
+        "y": 340,
         "wires": [
             [
                 "40f20abd.041354"
             ]
         ]
+    },
+    {
+        "id": "d5ff2d3e.971a3",
+        "type": "debug",
+        "z": "48d2709e.65773",
+        "name": "",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "x": 320,
+        "y": 20,
+        "wires": []
     }
 ]

@@ -8,6 +8,9 @@
 	<!-- <link rel="stylesheet" href="bootstrap.min.css" type="text/css" media="all"> -->
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 
+	<script src="videoManager.js"></script>
+	<script src="socketWrangler.js"></script>
+	<script src="rekogUtils.js"></script>
 	<script src="capture.js"></script>
 	<style type="text/css">
 		#video {
@@ -118,10 +121,12 @@
 		<div class="col-sm">
 			<div id="todo" class="preformatted">
 [ ] handle websocket disconnects
-[ ] deal with username properly
+[X] deal with username properly
 [ ] Slow down auth calls when verified
 [ ] Require password before verify
 [ ] Rig up 'Are you still there?'
+[ ] Hide form when logged in.
+[ ] Hide camera before log in.
 			</div>
 		</div>
 	</div>

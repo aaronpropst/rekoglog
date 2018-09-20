@@ -1,3 +1,104 @@
+
+
+function setAuthorized(isAuthorized){
+  if (isAuthorized){
+      //$("#loginButton").prop('disabled', false);
+      $("#video").toggleClass("authorized", true);
+  }else{
+      //$("#loginButton").prop('disabled', true);
+      $("#video").toggleClass("authorized", false);
+  
+  }
+}
+
+
+$().ready(()=>{
+  var faceRect;
+  socket = socketWrangler();
+  socket.setMessageFn((event)=>{
+    try{
+      var resp = JSON.parse(event.data);
+
+      if (typeof resp.Authenticated === 'boolean'){
+        setAuthorized(resp.Authenticated == true);
+      }
+      if (typeof resp.LoggedIn === 'boolean' && resp.LoggedIn){
+        //currentState = flowStates.LoggedIn
+        console.log(resp);
+      }
+      
+
+      if (resp.FaceDetails && resp.FaceDetails.length >0){
+        var deets = resp.FaceDetails[0];
+        var bb = deets.BoundingBox;
+        faceRect = bb;
+
+        stats = rekogUtils().deetsToStats(deets);
+
+        landmarks = deets.Landmarks;
+        $('#stats').text(JSON.stringify(stats,null,4));
+      }
+
+
+      //console.log(resp);
+    }
+    catch(err){
+      console.error(err);
+      console.log(event.data);
+    }
+  });
+
+  //Set up the video viewer and drawing stuff
+  vm = videoManager();
+  vm.setRenderer((vid,ctx,out)=>{
+    ctx.clearRect(0, 0, out.width,out.height);
+    ctx.drawImage(vid, 0, 0,out.width,out.height);
+    if (faceRect){
+      ctx.beginPath();
+      ctx.strokeStyle="#FFFF00";
+      ctx.lineWidth="2px";
+      ctx.rect(
+        Math.floor(out.width * faceRect.Left),
+        Math.floor(out.height * faceRect.Top), 
+        Math.floor(out.width * faceRect.Width), 
+        Math.floor(out.height * faceRect.Height)
+      );
+    }
+    ctx.stroke();
+  });
+  vm.init(document.getElementById('video'));
+  $('#video').show();
+
+
+  //Set up form
+  $("#login").submit(function() {
+      
+    if (socket.ready()){
+      socket.send(JSON.stringify({
+        Login: true,
+        Username: $("#username").val(),
+        Password: $("#password").val()
+      }))
+    }else{
+      console.error("Socket wasn't open.  Can't submit form.");
+    }
+    return false;
+  });
+
+
+
+  //snap photos and send em to node-red
+  setInterval(()=>{
+    var blob = vm.takepicture();
+    socket.send(blob);
+  },2000);    
+
+
+});
+
+
+
+
 (function() {
   // The width and height of the captured photo. We will set the
   // width to the value defined here, but the height will be
@@ -25,18 +126,46 @@
   var landmarks = null;
   var videoSetUp = false;
 
-  const socket = new WebSocket('ws://localhost:1880/ws/');
+  var flowStates = {
+    Fresh: {
+      detect: false,
+      check: false,
+      next: "Dirty",
+      goNext: ()=>{
+        return $('#username').val() !== '';
+      }
+    },
+    Dirty: {
+      detect: true,
+      check: false,
+      next: "LoggedIn",
+      goNext: ()=>{
+        
+      }
+    },
+    LoggedIn: {
+      detect: true,
+      check: true,
+      next: "Authed"
+    },
+    Authed: {
+      detect: true,
+      check: false,
+      next: ""
+    }
+  }
+
+  var currentState = flowStates.Fresh;
+  function stateChange(){
+
+
+  }
+
 
 
   function startup() {
     outputCanvas = document.getElementById('video');
     outputContext = outputCanvas.getContext('2d');
-    video = document.createElement('video');
-    video.width = 1024; //outputCanvas.width;
-    video.height = 768; //outputCanvas.height;
-    canvas = document.createElement('canvas');
-    context = canvas.getContext('2d');
-    photo = document.createElement('image');;
     
     $("#login").submit(function() {
       
@@ -53,17 +182,17 @@
 
     clearphoto();
 
-		setInterval(()=>{
-      if ($("#username").val() !== ''){
-				if (!videoSetUp){
-					initVideo();
-				}
-        $("#video").show();
-        takepicture();
-      }else{
-        $("#video").hide();
-      }
-		},2000);    
+		// setInterval(()=>{
+    //   if ($("#username").val() !== ''){
+		// 		if (!videoSetUp){
+		// 			initVideo();
+		// 		}
+    //     $("#video").show();
+    //     takepicture();
+    //   }else{
+    //     $("#video").hide();
+    //   }
+		// },2000);    
 
   }
 
@@ -142,120 +271,13 @@
 
 
 
-  // Fill the photo with an indication that none has been
-  // captured.
-
-  function clearphoto() {
-    context.fillStyle = "#AAA";
-    context.fillRect(0, 0, canvas.width, canvas.height);
-
-    var data = canvas.toDataURL('image/png');
-    photo.setAttribute('src', data);
-	
-    var blob = dataURItoBlob(data);
-    var fd = new FormData(document.forms[0]);
-    fd.append("canvasImage", blob);
-  }
- 
-function dataURItoBlob(dataURI) {
-    var binary = atob(dataURI.split(',')[1]);
-    var array = [];
-    for(var i = 0; i < binary.length; i++) {
-        array.push(binary.charCodeAt(i));
-    }
-    return new Blob([new Uint8Array(array)], {type: 'image/jpeg'});
-}
- 
-  // Capture a photo by fetching the current contents of the video
-  // and drawing it into a canvas, then converting that to a PNG
-  // format data URL. By drawing it on an offscreen canvas and then
-  // drawing that to the screen, we can change its size and/or apply
-  // other changes before drawing it.
-
-  function takepicture() {
-    var context = canvas.getContext('2d');
-      canvas.width = outputCanvas.width;
-      canvas.height = outputCanvas.height;
-      context.drawImage(video, 0, 0, outputCanvas.width, outputCanvas.height);
-    
-      var data = canvas.toDataURL('image/png');
-      photo.setAttribute('src', data);
-
-      var blob = dataURItoBlob(data);
-      var fd = new FormData();
-
-      fd.append("canvasImage", blob);
-      socket.send(blob);
-      
-  }
-	
-	function setAuthorized(isAuthorized){
-		if (isAuthorized){
-				$("#loginButton").prop('disabled', false);
-        $("#video").toggleClass("authorized", true);
-		}else{
-				$("#loginButton").prop('disabled', true);
-        $("#video").toggleClass("authorized", false);
-		
-		}
-	}
 
 
 
 
-	// Connection opened
-	socket.addEventListener('open', function (event) {
-		//socket.send('Hello Server!');
-	});
-
-	socket.addEventListener('close', function (event) {
-    //socket.send('Hello Server!');
-    
-	});
-
-
-	// Listen for messages
-	socket.addEventListener('message', function (event) {
-    
-    try{
-      var resp = JSON.parse(event.data);
-
-      if (typeof resp.Authenticated === 'boolean'){
-        setAuthorized(resp.Authenticated == true);
-      }
-      
-
-      if (resp.FaceDetails && resp.FaceDetails.length >0){
-        var deets = resp.FaceDetails[0];
-        var bb = deets.BoundingBox;
-        faceRect = bb;
-
-        onlySure=(x)=>{
-          return x.Confidence > 80 ? x.Value : undefined;
-        }
-
-        var stats = {
-          AgeRange: deets.AgeRange,
-          Beard: onlySure(deets.Beard),
-          Mustache: onlySure(deets.Mustache),
-          Eyeglasses: onlySure(deets.Eyeglasses),
-          Gender: onlySure(deets.Gender),
-          Emotion: deets.Emotions[0].Type
-        }
-        landmarks = deets.Landmarks;
-        $('#stats').text(JSON.stringify(stats,null,4));
-      }
-
-
-      console.log(resp);
-    }
-    catch{
-      console.log(event.data);
-    }
-	});
 
 
   // Set up our event listener to run the startup process
   // once loading is complete.
   window.addEventListener('load', startup, false);
-})();
+})//();
