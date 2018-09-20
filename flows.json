@@ -685,7 +685,7 @@
         "FaceId": "",
         "Video": "",
         "name": "",
-        "x": 720,
+        "x": 760,
         "y": 40,
         "wires": [
             [
@@ -755,7 +755,8 @@
         "y": 200,
         "wires": [
             [
-                "40f20abd.041354"
+                "40f20abd.041354",
+                "98df3a32.f6a7b8"
             ]
         ]
     },
@@ -768,11 +769,12 @@
             "d500a692.cd4dc8",
             "c2c67543.54fc78"
         ],
-        "x": 850,
-        "y": 420,
+        "x": 830,
+        "y": 440,
         "wires": [
             [
-                "65053809.6d4458"
+                "65053809.6d4458",
+                "59a4e775.68c938"
             ]
         ]
     },
@@ -863,8 +865,8 @@
         "FaceId": "",
         "Video": "",
         "name": "",
-        "x": 550,
-        "y": 300,
+        "x": 610,
+        "y": 280,
         "wires": [
             [
                 "40f20abd.041354"
@@ -955,6 +957,34 @@
         "complete": "true",
         "x": 320,
         "y": 20,
+        "wires": []
+    },
+    {
+        "id": "98df3a32.f6a7b8",
+        "type": "debug",
+        "z": "48d2709e.65773",
+        "name": "",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "x": 1290,
+        "y": 200,
+        "wires": []
+    },
+    {
+        "id": "59a4e775.68c938",
+        "type": "debug",
+        "z": "48d2709e.65773",
+        "name": "",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "x": 1030,
+        "y": 500,
         "wires": []
     }
 ]

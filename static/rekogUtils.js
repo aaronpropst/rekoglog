@@ -11,7 +11,10 @@ rekogUtils = function(){
         Mustache: onlySure(deets.Mustache),
         Eyeglasses: onlySure(deets.Eyeglasses),
         Gender: onlySure(deets.Gender),
-        Emotion: deets.Emotions[0].Type
+        MouthOpen: onlySure(deets.MouthOpen),
+        Smile: onlySure(deets.Smile),
+        Emotion: deets.Emotions[0].Type,
+        //All: deets
       }
   
       return stats;
