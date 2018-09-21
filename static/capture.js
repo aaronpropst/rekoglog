@@ -1,15 +1,12 @@
 
 
-// function setAuthorized(isAuthorized){
-//     if (isAuthorized){
-//         //$("#loginButton").prop('disabled', false);
-//         $("#video").toggleClass("authorized", true);
-//     }else{
-//         //$("#loginButton").prop('disabled', true);
-//         $("#video").toggleClass("authorized", false);
-        
-//     }
-// }
+function setAuthorized(isAuthorized){
+    if (isAuthorized){
+        $("#video").toggleClass("authorized", true);
+    }else{
+        $("#video").toggleClass("authorized", false);
+    }
+}
 
 
 
@@ -29,6 +26,7 @@ $().ready(()=>{
             console.info('FS Message:',fs.name);
             fsMessageHandlers={
                 "login": (resp) => {
+                    setAuthorized(false);
                     if (typeof resp.LoggedIn === 'boolean'){
                         fm.setUserName(resp.UserName);
                         console.log(resp);
@@ -37,10 +35,12 @@ $().ready(()=>{
                 },
                 "auth": (resp) => {
                     if (typeof resp.Authenticated === 'boolean' && typeof resp.Error === 'undefined' && resp.Authenticated){
+                        setAuthorized(true);
                         fm.setFlowState(2);
                     }
                 },
                 "authhuman": (resp) => {
+                    setAuthorized(true);
                     if (stats.MouthOpen){
                         fm.setFlowState(3);
                     }

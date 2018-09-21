@@ -52,7 +52,8 @@
                 "default": "#097479",
                 "baseColor": "#097479",
                 "baseFont": "-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Oxygen-Sans,Ubuntu,Cantarell,Helvetica Neue,sans-serif",
-                "edited": false
+                "edited": true,
+                "reset": false
             },
             "customTheme": {
                 "name": "Untitled Theme 1",
@@ -109,7 +110,7 @@
         },
         "site": {
             "name": "Node-RED Dashboard",
-            "hideToolbar": "false",
+            "hideToolbar": "true",
             "allowSwipe": "false",
             "allowTempTheme": "true",
             "dateFormat": "DD/MM/YYYY",
@@ -124,6 +125,23 @@
                 "py": 0
             }
         }
+    },
+    {
+        "id": "90b6c412.f245c8",
+        "type": "ui_tab",
+        "z": "",
+        "name": "Home",
+        "icon": "dashboard"
+    },
+    {
+        "id": "ea4107bc.d4c518",
+        "type": "ui_group",
+        "z": "",
+        "name": "Default",
+        "tab": "90b6c412.f245c8",
+        "disp": false,
+        "width": "12",
+        "collapse": false
     },
     {
         "id": "84a19310.dce7f",
@@ -618,7 +636,8 @@
         "wires": [
             [
                 "bb4a9347.b009f",
-                "d5ff2d3e.971a3"
+                "d5ff2d3e.971a3",
+                "5ab35e6d.65b93"
             ]
         ]
     },
@@ -638,7 +657,7 @@
         "type": "debug",
         "z": "48d2709e.65773",
         "name": "",
-        "active": true,
+        "active": false,
         "tosidebar": true,
         "console": false,
         "tostatus": false,
@@ -689,7 +708,8 @@
         "y": 40,
         "wires": [
             [
-                "284637ac.402eb8"
+                "284637ac.402eb8",
+                "764134a3.4e377c"
             ]
         ]
     },
@@ -755,8 +775,7 @@
         "y": 200,
         "wires": [
             [
-                "40f20abd.041354",
-                "98df3a32.f6a7b8"
+                "40f20abd.041354"
             ]
         ]
     },
@@ -769,12 +788,11 @@
             "d500a692.cd4dc8",
             "c2c67543.54fc78"
         ],
-        "x": 830,
-        "y": 440,
+        "x": 1030,
+        "y": 120,
         "wires": [
             [
-                "65053809.6d4458",
-                "59a4e775.68c938"
+                "65053809.6d4458"
             ]
         ]
     },
@@ -786,8 +804,8 @@
         "func": "if (msg.payload.FaceMatches &&\nmsg.payload.FaceMatches.length == 0){\n    msg.error = {\n        message: \"No faces matched\"\n    };\n    return [null,msg]\n    \n}else{\n    return [msg,null]\n}\nreturn msg;",
         "outputs": 2,
         "noerr": 0,
-        "x": 1000,
-        "y": 100,
+        "x": 1040,
+        "y": 40,
         "wires": [
             [
                 "785fd9d.5deee28"
@@ -809,8 +827,8 @@
         "func": "msg.payload = {}\nmsg.payload.Authenticated = false\n\nif (msg.error){\n    msg.payload[\"Error\"] = msg.error.message;\n}\n\nreturn msg;",
         "outputs": 1,
         "noerr": 0,
-        "x": 1060,
-        "y": 420,
+        "x": 1240,
+        "y": 100,
         "wires": [
             [
                 "40f20abd.041354"
@@ -842,7 +860,8 @@
         "y": 280,
         "wires": [
             [
-                "40f20abd.041354"
+                "40f20abd.041354",
+                "23add301.dac6cc"
             ]
         ]
     },
@@ -933,31 +952,235 @@
         "wires": []
     },
     {
-        "id": "98df3a32.f6a7b8",
-        "type": "debug",
+        "id": "62e0ebe.947d614",
+        "type": "ui_chart",
         "z": "48d2709e.65773",
         "name": "",
-        "active": true,
-        "tosidebar": true,
-        "console": false,
-        "tostatus": false,
-        "complete": "true",
-        "x": 1290,
-        "y": 200,
-        "wires": []
+        "group": "ea4107bc.d4c518",
+        "order": 0,
+        "width": "0",
+        "height": "0",
+        "label": "Similarity",
+        "chartType": "line",
+        "legend": "false",
+        "xformat": "HH:mm:ss",
+        "interpolate": "linear",
+        "nodata": "",
+        "dot": false,
+        "ymin": "",
+        "ymax": "",
+        "removeOlder": 1,
+        "removeOlderPoints": "",
+        "removeOlderUnit": "3600",
+        "cutout": 0,
+        "useOneColor": false,
+        "colors": [
+            "#1f77b4",
+            "#aec7e8",
+            "#ff7f0e",
+            "#2ca02c",
+            "#98df8a",
+            "#d62728",
+            "#ff9896",
+            "#9467bd",
+            "#c5b0d5"
+        ],
+        "useOldStyle": false,
+        "x": 1060,
+        "y": 620,
+        "wires": [
+            [],
+            []
+        ]
     },
     {
-        "id": "59a4e775.68c938",
-        "type": "debug",
+        "id": "764134a3.4e377c",
+        "type": "change",
         "z": "48d2709e.65773",
         "name": "",
-        "active": true,
-        "tosidebar": true,
-        "console": false,
-        "tostatus": false,
-        "complete": "true",
-        "x": 1030,
-        "y": 480,
-        "wires": []
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "payload.FaceMatches[0].Similarity",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 800,
+        "y": 600,
+        "wires": [
+            [
+                "62e0ebe.947d614"
+            ]
+        ]
+    },
+    {
+        "id": "977a2314.e03a7",
+        "type": "ui_chart",
+        "z": "48d2709e.65773",
+        "name": "",
+        "group": "ea4107bc.d4c518",
+        "order": 0,
+        "width": "0",
+        "height": "0",
+        "label": "Age Range",
+        "chartType": "line",
+        "legend": "false",
+        "xformat": "HH:mm:ss",
+        "interpolate": "linear",
+        "nodata": "",
+        "dot": false,
+        "ymin": "",
+        "ymax": "",
+        "removeOlder": 1,
+        "removeOlderPoints": "",
+        "removeOlderUnit": "3600",
+        "cutout": 0,
+        "useOneColor": false,
+        "colors": [
+            "#1f77b4",
+            "#aec7e8",
+            "#ff7f0e",
+            "#2ca02c",
+            "#98df8a",
+            "#d62728",
+            "#ff9896",
+            "#9467bd",
+            "#c5b0d5"
+        ],
+        "useOldStyle": false,
+        "x": 1050,
+        "y": 700,
+        "wires": [
+            [],
+            []
+        ]
+    },
+    {
+        "id": "23add301.dac6cc",
+        "type": "function",
+        "z": "48d2709e.65773",
+        "name": "",
+        "func": "\nreturn [\n    [\n        {\n            payload: msg.payload.FaceDetails[0].AgeRange.Low,\n            topic: 'low',\n        },\n        {\n            payload: msg.payload.FaceDetails[0].AgeRange.High,\n            topic: 'high',\n        }\n    ]\n];",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 580,
+        "y": 640,
+        "wires": [
+            [
+                "977a2314.e03a7"
+            ]
+        ]
+    },
+    {
+        "id": "5ab35e6d.65b93",
+        "type": "change",
+        "z": "48d2709e.65773",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "sessionMap",
+                "tot": "global"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 140,
+        "y": 540,
+        "wires": [
+            [
+                "afb282e1.b84b4"
+            ]
+        ]
+    },
+    {
+        "id": "afb282e1.b84b4",
+        "type": "yaml",
+        "z": "48d2709e.65773",
+        "property": "payload",
+        "name": "",
+        "x": 310,
+        "y": 540,
+        "wires": [
+            [
+                "8f3ac42a.11da38"
+            ]
+        ]
+    },
+    {
+        "id": "8f3ac42a.11da38",
+        "type": "ui_template",
+        "z": "48d2709e.65773",
+        "group": "ea4107bc.d4c518",
+        "name": "",
+        "order": 0,
+        "width": 0,
+        "height": 0,
+        "format": "<div ng-bind-html=\"msg.payload\" style=\"font-family: monospace; white-space: pre;\"></div>",
+        "storeOutMessages": true,
+        "fwdInMessages": true,
+        "templateScope": "local",
+        "x": 440,
+        "y": 540,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "c6dd9df2.a6ad1",
+        "type": "inject",
+        "z": "48d2709e.65773",
+        "name": "",
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "repeat": "",
+        "crontab": "",
+        "once": true,
+        "onceDelay": 0.1,
+        "x": 110,
+        "y": 760,
+        "wires": [
+            [
+                "e36d3610.8ff298"
+            ]
+        ]
+    },
+    {
+        "id": "e36d3610.8ff298",
+        "type": "change",
+        "z": "48d2709e.65773",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "sessionMap",
+                "pt": "global",
+                "to": "{}",
+                "tot": "jsonata"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 320,
+        "y": 760,
+        "wires": [
+            []
+        ]
     }
 ]
