@@ -1,6 +1,7 @@
 
 var socketWrangler = function(){
-    var socket = new ReconnectingWebSocket('ws://localhost:1880/ws/');
+    var url = (document.location.protocol == 'https:' ? 'wss:' : 'ws:')+'//'+(document.location.hostname)+(document.location.port ? ":"+document.location.port : '');
+    var socket = new ReconnectingWebSocket(url + '/ws/');
     var messageFn;
   
     function setMessageFn(fn){
