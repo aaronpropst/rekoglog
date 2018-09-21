@@ -107,6 +107,8 @@ function flowManager(videoManager,socket){
 
         $('#site').toggle(fs.name === 'inside');
 
+        $('#stats').toggle(fs.name != 'login');
+
         if (fs.showVid && !vm.initialized()){
             vm.init(document.getElementById('video'));
         }
