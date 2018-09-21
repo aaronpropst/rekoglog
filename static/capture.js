@@ -19,9 +19,9 @@ $().ready(()=>{
     var fm;
     var faceRect;
     var stats;
+
     socket = socketWrangler();
     socket.setMessageFn((event)=>{
-        //try{
             var resp = JSON.parse(event.data);
             
 
@@ -30,6 +30,7 @@ $().ready(()=>{
             fsMessageHandlers={
                 "login": (resp) => {
                     if (typeof resp.LoggedIn === 'boolean'){
+                        fm.setUserName(resp.UserName);
                         console.log(resp);
                         fm.setFlowState(1); //auth
                     }
@@ -64,11 +65,7 @@ $().ready(()=>{
             }
             //Run the appropriate handler based on where we're at in the process
             fsMessageHandlers[fs.name](resp);
-        // }
-        // catch(err){
-        //     console.error(err);
-        //     console.log(event.data);
-        // }
+
     });
     
     
@@ -99,15 +96,11 @@ $().ready(()=>{
         //Set up form
         $("#login").submit(function() {
             
-            if (socket.ready()){
-                socket.send(JSON.stringify({
-                    Login: true,
-                    Username: $("#username").val(),
-                    Password: $("#password").val()
-                }))
-            }else{
-                console.error("Socket wasn't open.  Can't submit form.");
-            }
+            socket.send(JSON.stringify({
+                Login: true,
+                Username: $("#username").val(),
+                Password: $("#password").val()
+            }))
             return false;
         });
         

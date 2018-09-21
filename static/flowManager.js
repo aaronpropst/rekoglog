@@ -28,7 +28,7 @@ function flowManager(videoManager,socket){
     var vm = videoManager;
     var socket = socket;
     var loginLatch = false;
-
+    var username = '';
     var flow=[
         new flowstate({
             name: "login",
@@ -84,11 +84,25 @@ function flowManager(videoManager,socket){
         if (typeof fs.beforestate === 'function') fs.beforestate();
 
         
+        var template = (id,val)=>{
+            if (typeof $(id).attr('template') === 'undefined'){
+                $(id).attr('template',$(id).text());
+            }
+            $(id).text($(id).attr('template').replace('[NAME]', val));
+    
+        }
         $('#login').toggle(fs.showForm);
         $('#welcomeMessage').toggle(fs.name == 'auth');
+        template('#welcomeMessage',username);
+
         $('#areYouHuman').toggle(fs.name == 'authhuman');
+        template('#areYouHuman',username);
+
         $('#video').toggle(fs.showVid);
+
         $('#allowedAccess').toggle(fs.name == 'inside');
+        template('#allowedAccess',username);
+
         $('#portal').toggle(fs.name == 'login' && loginLatch);
 
         if (fs.showVid && !vm.initialized()){
@@ -105,10 +119,14 @@ function flowManager(videoManager,socket){
     function getFlowState(){
         return flow[currentFS];
     }
+    function setUserName(s){
+        username = s;
+    }
 
     return {
         setFlowState: setFlowState,
         getFlowStateName: getFlowStateName,
-        getFlowState: getFlowState
+        getFlowState: getFlowState,
+        setUserName: setUserName
     }
 }

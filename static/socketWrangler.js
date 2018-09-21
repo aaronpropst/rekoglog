@@ -1,6 +1,6 @@
 
 var socketWrangler = function(){
-    const socket = new WebSocket('ws://localhost:1880/ws/');
+    var socket = new ReconnectingWebSocket('ws://localhost:1880/ws/');
     var messageFn;
   
     function setMessageFn(fn){
@@ -29,7 +29,14 @@ var socketWrangler = function(){
 
     return {
         ready: ()=>{return socket.readyState == socket.OPEN },
-        send: (data)=>{return socket.send(data)},
+        send: (data)=>{
+            try{
+                return socket.send(data)
+            }
+            catch(err){
+                console.warn(err, data);
+            }
+        },
         setMessageFn: setMessageFn
     }
   }

@@ -818,33 +818,6 @@
         ]
     },
     {
-        "id": "d232f718.b81fe8",
-        "type": "AWS Rekognition",
-        "z": "48d2709e.65773",
-        "aws": "9c11537c.9739c",
-        "operation": "CreateStreamProcessor",
-        "SourceImage": "",
-        "TargetImage": "",
-        "CollectionId": "",
-        "Input": "",
-        "Output": "",
-        "Name": "",
-        "Settings": "",
-        "RoleArn": "",
-        "FaceIds": "",
-        "Image": "",
-        "Id": "",
-        "JobId": "",
-        "FaceId": "",
-        "Video": "",
-        "name": "",
-        "x": 670,
-        "y": 920,
-        "wires": [
-            []
-        ]
-    },
-    {
         "id": "1db07027.0a0e3",
         "type": "AWS Rekognition",
         "z": "48d2709e.65773",
@@ -984,7 +957,7 @@
         "tostatus": false,
         "complete": "true",
         "x": 1030,
-        "y": 500,
+        "y": 480,
         "wires": []
     }
 ]
