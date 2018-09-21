@@ -21,20 +21,23 @@ $().ready(()=>{
     var stats;
     socket = socketWrangler();
     socket.setMessageFn((event)=>{
-        try{
+        //try{
             var resp = JSON.parse(event.data);
             
-            console.info(resp);
 
             var fs = fm.getFlowState();
+            console.info('FS Message:',fs.name);
             fsMessageHandlers={
                 "login": (resp) => {
-                    if (! typeof resp.LoggedIn === 'boolean') return;
-                    fm.setFlowState(1); //auth
+                    if (typeof resp.LoggedIn === 'boolean'){
+                        console.log(resp);
+                        fm.setFlowState(1); //auth
+                    }
                 },
                 "auth": (resp) => {
-                    if (! typeof resp.Authenticated === 'boolean') return;
-                    fm.setFlowState(2);
+                    if (typeof resp.Authenticated === 'boolean' && typeof resp.Error === 'undefined' && resp.Authenticated){
+                        fm.setFlowState(2);
+                    }
                 },
                 "authhuman": (resp) => {
                     if (stats.MouthOpen){
@@ -45,14 +48,7 @@ $().ready(()=>{
                     if (resp.FaceDetails && resp.FaceDetails.length == 0){
                         fm.setFlowState(0,true); //target lost
                     }
-                },
-                //"targetlost": () => {
-                //    if (! typeof resp.LoggedIn === 'boolean') return;
-
-                    //fm.setFlowState(1,true); //auth
-                    //console.log(resp);    
-
-                //}
+                }
             }
             
             //always gather deets if they're available.
@@ -68,11 +64,11 @@ $().ready(()=>{
             }
             //Run the appropriate handler based on where we're at in the process
             fsMessageHandlers[fs.name](resp);
-        }
-        catch(err){
-            console.error(err);
-            console.log(event.data);
-        }
+        // }
+        // catch(err){
+        //     console.error(err);
+        //     console.log(event.data);
+        // }
     });
     
     

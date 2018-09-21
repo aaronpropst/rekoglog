@@ -19,17 +19,27 @@ function flowstate(obj){
     }else{
         this.snapInterval = 5000;
     }
+    if (typeof obj.afterstate === 'function') this.afterstate = obj.afterstate;
+    if (typeof obj.beforestate === 'function') this.beforestate = obj.beforestate;
 }
   
   
 function flowManager(videoManager,socket){
     var vm = videoManager;
     var socket = socket;
-    var currentSnapInterval = 5000;
+    var loginLatch = false;
+
     var flow=[
         new flowstate({
             name: "login",
             showForm: true,
+            beforestate: ()=>{
+                $('#username').val('');
+                $('#password').val('');
+            },
+            afterstate: ()=>{
+                loginLatch = true;
+            }
         }),
         new flowstate({
             name: "auth",
@@ -49,10 +59,6 @@ function flowManager(videoManager,socket){
             name: "inside",
             detectFace: true,
             snapInterval: 5000
-        }),
-        new flowstate({
-            name: "targetlost",
-            showForm: true
         })
         
     ];
@@ -71,24 +77,25 @@ function flowManager(videoManager,socket){
     })();
     
     function setFlowState(fsIndex, allowBack){
-        if (!allowBack && (currentFS == fsIndex || fsIndex < currentFS)) return;
+        console.info("FS Set:", fsIndex, allowBack);
+        if (!allowBack && (currentFS == fsIndex || fsIndex < currentFS)) return;    //debounce
         currentFS = fsIndex;
         fs = flow[fsIndex];
+        if (typeof fs.beforestate === 'function') fs.beforestate();
+
         
         $('#login').toggle(fs.showForm);
         $('#welcomeMessage').toggle(fs.name == 'auth');
         $('#areYouHuman').toggle(fs.name == 'authhuman');
         $('#video').toggle(fs.showVid);
         $('#allowedAccess').toggle(fs.name == 'inside');
-        $('#portal').toggle(fs.name == 'targetlost');
+        $('#portal').toggle(fs.name == 'login' && loginLatch);
 
         if (fs.showVid && !vm.initialized()){
             vm.init(document.getElementById('video'));
-        //}else if (!fs.showVid && flow[currentFS -1] && flow[currentFS -1].showVid){   //transition to turn off vid..
-            //vm.stop();
         }
         
-
+        if (typeof fs.onstate === 'function') fs.afterstate();
     }
 
     function getFlowStateName(){
