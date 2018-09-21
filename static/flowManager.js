@@ -95,7 +95,7 @@ function flowManager(videoManager,socket){
             vm.init(document.getElementById('video'));
         }
         
-        if (typeof fs.onstate === 'function') fs.afterstate();
+        if (typeof fs.afterstate === 'function') fs.afterstate();
     }
 
     function getFlowStateName(){
