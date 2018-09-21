@@ -1,15 +1,15 @@
 
 
-function setAuthorized(isAuthorized){
-    if (isAuthorized){
-        //$("#loginButton").prop('disabled', false);
-        $("#video").toggleClass("authorized", true);
-    }else{
-        //$("#loginButton").prop('disabled', true);
-        $("#video").toggleClass("authorized", false);
+// function setAuthorized(isAuthorized){
+//     if (isAuthorized){
+//         //$("#loginButton").prop('disabled', false);
+//         $("#video").toggleClass("authorized", true);
+//     }else{
+//         //$("#loginButton").prop('disabled', true);
+//         $("#video").toggleClass("authorized", false);
         
-    }
-}
+//     }
+// }
 
 
 
@@ -24,19 +24,38 @@ $().ready(()=>{
         try{
             var resp = JSON.parse(event.data);
             
-            console.log(resp);
+            console.info(resp);
 
-            if (typeof resp.Authenticated === 'boolean'){
-                setAuthorized(resp.Authenticated == true);
-                fm.setFlowState(2);
+            var fs = fm.getFlowState();
+            fsMessageHandlers={
+                "login": (resp) => {
+                    if (! typeof resp.LoggedIn === 'boolean') return;
+                    fm.setFlowState(1); //auth
+                },
+                "auth": (resp) => {
+                    if (! typeof resp.Authenticated === 'boolean') return;
+                    fm.setFlowState(2);
+                },
+                "authhuman": (resp) => {
+                    if (stats.MouthOpen){
+                        fm.setFlowState(3);
+                    }
+                },
+                "inside": (resp) => {
+                    if (resp.FaceDetails && resp.FaceDetails.length == 0){
+                        fm.setFlowState(0,true); //target lost
+                    }
+                },
+                //"targetlost": () => {
+                //    if (! typeof resp.LoggedIn === 'boolean') return;
+
+                    //fm.setFlowState(1,true); //auth
+                    //console.log(resp);    
+
+                //}
             }
-            if (typeof resp.LoggedIn === 'boolean' && resp.LoggedIn){
-                //currentState = flowStates.LoggedIn
-                fm.setFlowState(1);
-                console.log(resp);
-            }
-                        
             
+            //always gather deets if they're available.
             if (resp.FaceDetails && resp.FaceDetails.length >0){
                 var deets = resp.FaceDetails[0];
                 var bb = deets.BoundingBox;
@@ -47,17 +66,8 @@ $().ready(()=>{
                 landmarks = deets.Landmarks;
                 $('#stats').text(JSON.stringify(stats,null,4));
             }
-            
-            if (fm.getFlowStateName() === 'authhuman'){
-                if (stats.MouthOpen){
-                    fm.setFlowState(3);
-                }
-            }
-
-
-
-            
-            //console.log(resp);
+            //Run the appropriate handler based on where we're at in the process
+            fsMessageHandlers[fs.name](resp);
         }
         catch(err){
             console.error(err);

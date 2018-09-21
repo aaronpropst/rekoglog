@@ -90,33 +90,38 @@
 			font-family: monospace;
 			white-space: pre;
 		}
+		#portal img{
+			width: 400px;
+			height: 225px;
+		}
 	</style>
 </head>
 <body>
 <div id="contentarea" class="contentarea container">
 	<div class="row">
 		<div class="lform col-sm">
-			<form id="login">
+			<form id="login" style="display: none">
 				<label for="username">Username:</label> <input id="username" name="username" type="text" /><br/>
 				<label for="password">Password:</label> <input id="password" name="password" type="password" /><br/>
 				<input id="loginButton" type="submit" value="Log In" />
 			</form>
-			<div id="welcomeMessage">
+			<div id="welcomeMessage" style="display: none">
 				Hello [NAME]!  Just a couple more steps.. smile for the camera.
 			</div>
-			<div id="areYouHuman">
-				Not bad.  But are you human?  Open your mouth.
+			<div id="areYouHuman" style="display: none">
+				You look like [NAME].  But are you human?  Open your mouth.
 			</div>
-			<div id="allowedAccess">
-				You seem like good people.  Welcome to the site.
+			<div id="allowedAccess" style="display: none">
+				You seem like good people [NAME].  Welcome to the site.
 			</div>
 		</div>
 
 
 		<div class="camera col-sm">
-			<canvas id="video"></canvas>
-			<!-- <video id="video">Video stream not available.</video> -->
-			<!--<button id="startbutton">Take photo</button> -->
+			<canvas id="video" style="display: none"></canvas>
+			<div id="portal" style="display: none">
+				<img src="target-lost-are-you-still-there.jpg" />
+			</div>
 		</div>
 
 	</div>
@@ -126,13 +131,14 @@
 		</div>
 		<div class="col-sm">
 			<div id="todo" class="preformatted">
-[ ] handle websocket disconnects
 [X] deal with username properly
-[ ] Slow down auth calls when verified
-[ ] Require password before verify
+[X] Require password before verify
+[X] Hide form when logged in.
+[X] Hide camera before log in.
+[ ] handle websocket disconnects
+[X] Slow down auth calls when verified
 [ ] Rig up 'Are you still there?'
-[ ] Hide form when logged in.
-[ ] Hide camera before log in.
+[ ] Personalize [NAME].
 			</div>
 		</div>
 	</div>
